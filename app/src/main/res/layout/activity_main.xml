@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+    android:layout_height="match_parent" android:padding="10dp" tools:context=".MainActivity">
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="set password"
+        android:id="@+id/btn_setpassword"
+        />
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="open lock"
+        android:id="@+id/btn_openlock"
+        android:layout_below="@id/btn_setpassword"/>
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="reset password"
+        android:id="@+id/btn_resetpassword"
+        android:layout_below="@id/btn_openlock"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/tv_message"
+        android:layout_below="@id/btn_resetpassword"
+        android:textSize="15sp"
+        android:gravity="center_horizontal"/>
+
+    <com.bupt.enniu.lockviewdemo.LockView
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:padding="10dp"
+        android:id="@+id/lockview"
+        android:layout_margin="20dp"
+        android:layout_below="@id/tv_message"
+        android:visibility="visible"
+        android:layout_centerHorizontal="true"/>
+
+</RelativeLayout>
