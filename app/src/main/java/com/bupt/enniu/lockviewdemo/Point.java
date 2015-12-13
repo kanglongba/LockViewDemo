@@ -1,7 +1,6 @@
 package com.bupt.enniu.lockviewdemo;
 
 import android.graphics.RectF;
-import android.util.Log;
 
 /**
  * Created by edison on 15/12/11.
@@ -20,12 +19,14 @@ public class Point {
     int centerY; //圆心的坐标
 
     public Point(int index, int sideLength, int paddingLeft, int paddingTop) {
-        this.index = index;
-        this.sideLength = sideLength;
+
         initPoint(index, sideLength, paddingLeft, paddingTop);
     }
 
     private void initPoint(int index, int sideLength, int paddingLeft, int paddingTop) {
+        this.index = index;
+        this.sideLength = sideLength;
+
         state = 0;
 
         length = gap = sideLength / 5; //圆与圆之间的间隔为一个圆

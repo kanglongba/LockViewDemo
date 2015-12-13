@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="LockView">
+        <attr name="lock_selected" format="reference"></attr>
+        <attr name="lock_selected_error" format="reference"></attr>
+        <attr name="lock_unselected" format="reference"></attr>
+        <attr name="title_set_password_again" format="string"></attr>
+        <attr name="title_set_password_error" format="string"></attr>
+        <attr name="title_unlock_password_right" format="string"></attr>
+        <attr name="title_unlock_password_error" format="string"></attr>
+        <attr name="title_unlock_password_overtime" format="string"></attr>
+        <attr name="title_reset_password_new" format="string"></attr>
+        <attr name="title_reset_password_again" format="string"></attr>
+        <attr name="title_reset_password_error" format="string"></attr>
+    </declare-styleable>
+
+</resources>

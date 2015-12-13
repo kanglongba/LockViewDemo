@@ -2,17 +2,16 @@ package com.bupt.enniu.lockviewdemo;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.res.TypedArray;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.graphics.drawable.BitmapDrawable;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.Toast;
 
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -35,7 +34,10 @@ import java.util.List;
  *
  * 注意事项:
  *  1.LockView被强制成正方形,高度被强制等于宽度,因此android:layout_width有效,而 android:layout_height无效.
- *
+ *  2.必须在xml中设置密码锁的图标
+ *  3.必须实现接口 OnUpdateMessageListener 和 OnLockPanelListener,否则没有提示语和锁定功能
+ *  3.可以在xml中制定提示文案(需补上相关代码).
+ *  4.可以增加小指示盘,但需要实现接口OnUpdateIndicatorListener:根据pointTrace更新小指示盘
  */
 public class LockView extends View {
     Context context;
@@ -66,20 +68,20 @@ public class LockView extends View {
     public LockView(Context context, AttributeSet attrs) {
         super(context, attrs);
 
-        init(context);
+        init(context,attrs);
     }
 
     public LockView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
 
-        init(context);
+        init(context,attrs);
     }
 
     public LockView(Context context) {
         super(context);
     }
 
-    private void init(Context context) {
+    private void init(Context context,AttributeSet attrs) {
         this.context = context;
 
         //主要用于绘制轨迹
@@ -88,9 +90,17 @@ public class LockView extends View {
         paint.setStrokeWidth(5);
 
         //获取到三个bitmap
-        lock_selected = BitmapFactory.decodeResource(context.getResources(), R.drawable.lock_selected);
-        lock_unselected = BitmapFactory.decodeResource(context.getResources(), R.drawable.lock_unselected);
-        lock_error_selected = BitmapFactory.decodeResource(context.getResources(), R.drawable.lock_error_selected);
+        TypedArray typedArray = context.obtainStyledAttributes(attrs,R.styleable.LockView,0,0);
+        try{
+            BitmapDrawable bd_lock_selected = (BitmapDrawable)typedArray.getDrawable(R.styleable.LockView_lock_selected);
+            BitmapDrawable bd_lock_selected_error = (BitmapDrawable)typedArray.getDrawable(R.styleable.LockView_lock_selected_error);
+            BitmapDrawable bd_lock_unselected = (BitmapDrawable)typedArray.getDrawable(R.styleable.LockView_lock_unselected);
+            lock_selected = bd_lock_selected.getBitmap();
+            lock_error_selected = bd_lock_selected_error.getBitmap();
+            lock_unselected = bd_lock_unselected.getBitmap();
+        }finally {
+            typedArray.recycle();
+        }
 
         //取手势密码,如果没有设置过密码,将取出-1
         password = getPassword();
@@ -324,7 +334,7 @@ public class LockView extends View {
         }
     }
 
-    //重设密码
+    //重设密码,由解锁和设置密码组成.
     private void resetPassword() {
         String message = "";
         if (step == 1) {
@@ -444,16 +454,16 @@ public class LockView extends View {
         return null;
     }
 
-    //存储密码到SharedPreferences中
-    private void setPassword(String pw) {
+    //存储密码到SharedPreferences中,可重写成其他存储方式
+    public void setPassword(String pw) {
         SharedPreferences sp = context.getSharedPreferences("lock", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sp.edit();
         editor.putString("password", pw);
         editor.commit();
     }
 
-    //取出存储在SharedPreferences中的密码
-    private String getPassword() {
+    //取出存储在SharedPreferences中的密码,可重写成其他存储方式
+    public String getPassword() {
         SharedPreferences sp = context.getSharedPreferences("lock", Context.MODE_PRIVATE);
         String pw = sp.getString("password", "-1");
         return pw;
@@ -503,7 +513,7 @@ public class LockView extends View {
     }
 
     /**
-     * 接口,当尝试解锁次数超过限定次数后,锁定密码盘,一分钟内不让尝试.
+     * 接口,当尝试解锁次数超过限定次数后,锁定密码盘,一定时间间隔内不让尝试.
      */
     public interface OnLockPanelListener{
         public abstract  void onLockPanel();
@@ -517,6 +527,7 @@ public class LockView extends View {
 
     /**
      * 接口,更新密码锁的小指示盘.如果没有可以不设置.
+     * TODO,需要添加相关代码
      */
     public interface OnUpdateIndicatorListener{
         public abstract void onUpdateIndicator();

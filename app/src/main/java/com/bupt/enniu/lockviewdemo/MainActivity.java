@@ -64,17 +64,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.btn_setpassword:
                 String pw = sp.getString("password", "-1");
                 if ("-1".equalsIgnoreCase(pw)) {
+                    tv_message.setText("请输入密码");
                     lockView.setVisibility(View.VISIBLE);
                     lockView.setActionMode(0);
                 } else {
-                    Toast.makeText(getApplicationContext(), "密码已经设置", Toast.LENGTH_SHORT).show();
+                    tv_message.setText("密码已经设置");
                 }
                 break;
             case R.id.btn_openlock:
+                tv_message.setText("请输入设置的密码");
                 lockView.setVisibility(View.VISIBLE);
                 lockView.setActionMode(1);
                 break;
             case R.id.btn_resetpassword:
+                tv_message.setText("请输入当前密码");
                 lockView.setVisibility(View.VISIBLE);
                 lockView.setActionMode(2);
                 break;
