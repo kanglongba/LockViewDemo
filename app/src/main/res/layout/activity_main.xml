@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    xmlns:LockView="http://schemas.android.com/apk/res-auto"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent" android:padding="10dp" tools:context=".MainActivity">
     <Button
@@ -31,17 +31,28 @@
         android:textSize="15sp"
         android:gravity="center_horizontal"/>
 
+    <com.bupt.enniu.lockviewdemo.IndicatorLockView
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_below="@id/tv_message"
+        android:id="@+id/lockview_indicator"
+        app:indicator_selected="@drawable/indicator_selected"
+        app:indicator_unselected="@drawable/indicator_unselected"
+        android:layout_centerHorizontal="true"
+        android:padding="1dp"
+        android:layout_margin="20dp"/>
+
     <com.bupt.enniu.lockviewdemo.LockView
         android:layout_width="200dp"
         android:layout_height="200dp"
         android:padding="10dp"
         android:id="@+id/lockview"
-        android:layout_margin="20dp"
-        android:layout_below="@id/tv_message"
+        android:layout_margin="10dp"
+        android:layout_below="@id/lockview_indicator"
         android:visibility="gone"
-        LockView:lock_selected="@drawable/lock_selected"
-        LockView:lock_selected_error="@drawable/lock_error_selected"
-        LockView:lock_unselected="@drawable/lock_unselected"
+        app:lock_selected="@drawable/lock_selected"
+        app:lock_selected_error="@drawable/lock_error_selected"
+        app:lock_unselected="@drawable/lock_unselected"
         android:layout_centerHorizontal="true"/>
 
 </RelativeLayout>

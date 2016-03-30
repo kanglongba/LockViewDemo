@@ -14,4 +14,8 @@
         <attr name="title_reset_password_error" format="string"></attr>
     </declare-styleable>
 
+    <declare-styleable name="IndicatorLockView">
+        <attr name="indicator_selected" format="reference" />
+        <attr name="indicator_unselected" format="reference" />
+    </declare-styleable>
 </resources>

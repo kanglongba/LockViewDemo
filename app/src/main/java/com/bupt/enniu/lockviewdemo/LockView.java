@@ -177,6 +177,7 @@ public class LockView extends View {
 
         drawPoints(canvas);
         drawLines(canvas, currentX, currentY);
+
     }
 
     //绘制所有的Point
@@ -252,6 +253,10 @@ public class LockView extends View {
                 break;
             case MotionEvent.ACTION_UP:
                 if (pointTrace.size() > 0) {
+                    Log.d("onDraw","run again");
+                    if(null != onUpdateIndicatorListener){
+                        onUpdateIndicatorListener.onUpdateIndicator();
+                    }
                     if (ActionMode == 0) {//初设密码
                         initPassword();
                     } else if (ActionMode == 1) { //打开密码锁
@@ -592,5 +597,13 @@ public class LockView extends View {
         Date date = new Date(time);
         String humanTime = dateFormat.format(date);
         return humanTime;
+    }
+
+    public List<Point> getPointTrace() {
+        return pointTrace;
+    }
+
+    public void setPointTrace(List<Point> pointTrace) {
+        this.pointTrace = pointTrace;
     }
 }

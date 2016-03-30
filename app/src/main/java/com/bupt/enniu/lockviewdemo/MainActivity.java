@@ -3,14 +3,16 @@ package com.bupt.enniu.lockviewdemo;
 import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener,LockView.OnUpdateMessageListener,LockView.OnLockPanelListener{
+public class MainActivity extends AppCompatActivity implements View.OnClickListener,LockView.OnUpdateMessageListener,LockView.OnLockPanelListener,LockView.OnUpdateIndicatorListener{
     LockView lockView;
+    IndicatorLockView indicatorLockView;
     Button btn_setpassword;
     Button btn_openlock;
     Button btn_resetpassword;
@@ -40,6 +42,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         lockView = (LockView)findViewById(R.id.lockview);
         lockView.setOnUpdateMessageListener(this);
         lockView.setOnLockPanelListener(this);
+        lockView.setOnUpdateIndicatorListener(this);
+
+        indicatorLockView = (IndicatorLockView)findViewById(R.id.lockview_indicator);
 
         sp = getSharedPreferences("lock",MODE_PRIVATE);
     }
@@ -101,5 +106,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 lockView.setVisibility(View.GONE);
             }
         },1000);
+    }
+
+    @Override
+    public void onUpdateIndicator() {
+        if(lockView.getPointTrace().size()>0)
+            Log.d("onDraw","run onUpdateIndicator");
+            indicatorLockView.setPath(lockView.getPointTrace());
     }
 }
