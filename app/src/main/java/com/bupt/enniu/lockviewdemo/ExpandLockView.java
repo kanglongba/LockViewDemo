@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.drawable.BitmapDrawable;
 import android.util.AttributeSet;
@@ -39,7 +40,7 @@ import java.util.List;
  *  3.可以在xml中制定提示文案(需补上相关代码).
  *  4.可以增加小指示盘,但需要实现接口OnUpdateIndicatorListener:根据pointTrace更新小指示盘
  */
-public class LockView extends View {
+public class ExpandLockView extends View {
     Context context;
 
     Point point0, point1, point2, point3, point4, point5, point6, point7, point8; //九个锁圈
@@ -48,6 +49,7 @@ public class LockView extends View {
     List<Point> pointTrace = new ArrayList<Point>(); //手势轨迹
 
     Paint paint;
+    Paint paintL; //绘制连线
     Bitmap lock_unselected, lock_selected, lock_error_selected;
 
     int currentX, currentY; //当前手指的坐标
@@ -65,19 +67,19 @@ public class LockView extends View {
 
     int try_time_restriction; //密码最多允许尝试5次
 
-    public LockView(Context context, AttributeSet attrs) {
+    public ExpandLockView(Context context, AttributeSet attrs) {
         super(context, attrs);
 
         init(context,attrs);
     }
 
-    public LockView(Context context, AttributeSet attrs, int defStyleAttr) {
+    public ExpandLockView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
 
         init(context,attrs);
     }
 
-    public LockView(Context context) {
+    public ExpandLockView(Context context) {
         super(context);
     }
 
@@ -89,12 +91,17 @@ public class LockView extends View {
         paint.setAntiAlias(true);
         paint.setStrokeWidth(5);
 
+        paintL = new Paint();
+        paintL.setAntiAlias(true);
+        paintL.setStrokeWidth(5);
+        paintL.setColor(Color.BLUE);
+
         //获取到三个bitmap
-        TypedArray typedArray = context.obtainStyledAttributes(attrs,R.styleable.LockView,0,0);
+        TypedArray typedArray = context.obtainStyledAttributes(attrs,R.styleable.ExpandLockView,0,0);
         try{
-            BitmapDrawable bd_lock_selected = (BitmapDrawable)typedArray.getDrawable(R.styleable.LockView_lock_selected);
-            BitmapDrawable bd_lock_selected_error = (BitmapDrawable)typedArray.getDrawable(R.styleable.LockView_lock_selected_error);
-            BitmapDrawable bd_lock_unselected = (BitmapDrawable)typedArray.getDrawable(R.styleable.LockView_lock_unselected);
+            BitmapDrawable bd_lock_selected = (BitmapDrawable)typedArray.getDrawable(R.styleable.ExpandLockView_lock_selected);
+            BitmapDrawable bd_lock_selected_error = (BitmapDrawable)typedArray.getDrawable(R.styleable.ExpandLockView_lock_selected_error);
+            BitmapDrawable bd_lock_unselected = (BitmapDrawable)typedArray.getDrawable(R.styleable.ExpandLockView_lock_unselected);
             lock_selected = bd_lock_selected.getBitmap();
             lock_error_selected = bd_lock_selected_error.getBitmap();
             lock_unselected = bd_lock_unselected.getBitmap();
@@ -199,11 +206,11 @@ public class LockView extends View {
             Point firstPoint = pointTrace.get(0);
 
             for (Point point : pointTrace) {
-                canvas.drawLine(firstPoint.getCenterX(), firstPoint.getCenterY(), point.getCenterX(), point.getCenterY(), paint);
+                canvas.drawLine(firstPoint.getCenterX(), firstPoint.getCenterY(), point.getCenterX(), point.getCenterY(), paintL);
                 firstPoint = point;
             }
 
-            canvas.drawLine(firstPoint.getCenterX(), firstPoint.getCenterY(), currentX, currentY, paint);
+            canvas.drawLine(firstPoint.getCenterX(), firstPoint.getCenterY(), currentX, currentY, paintL);
         }
     }
 
@@ -212,6 +219,7 @@ public class LockView extends View {
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 //重绘LockView,更新UI
+                paintL.setColor(Color.BLUE); //初始化轨迹画笔
                 if (!isReseted) {
                     resetLockView();
                     isReseted = true;
@@ -289,7 +297,7 @@ public class LockView extends View {
             if (password.equalsIgnoreCase(convertToPassword(pointTrace))) {
                 message = "密码已设置";
                 refreshLockView(100);
-                setPassword(password);
+                putPassword(password);
                 setVisibility(View.GONE);
                 ActionMode++; //切换到打开模式
                 step--;
@@ -298,6 +306,7 @@ public class LockView extends View {
                 for (Point point : pointTrace) {
                     point.setState(-1);
                 }
+                paintL.setColor(Color.RED);
                 refreshLockView(500);
                 step--;
             }
@@ -316,11 +325,19 @@ public class LockView extends View {
             setVisibility(View.GONE);
             try_time_restriction = 5;
         } else {
-            if(try_time_restriction>1) {
+            if(pointTrace.size()<4){ //轨迹小于四,弹出错误提示,但是不计入尝试次数
+                message = "密码错误";
+                for(Point point : pointTrace){
+                    point.setState(-1);
+                }
+                paintL.setColor(Color.RED);
+                refreshLockView(1000);
+            }else if(try_time_restriction>1) {
                 message = "密码错误,还可尝试" + String.valueOf(--try_time_restriction) + "次";
                 for (Point point : pointTrace) {
                     point.setState(-1);
                 }
+                paintL.setColor(Color.RED);
                 refreshLockView(2000);
             }else{
                 if(null != onLockPanelListener) {
@@ -330,6 +347,7 @@ public class LockView extends View {
                 for (Point point : pointTrace) {
                     point.setState(-1);
                 }
+                paintL.setColor(Color.RED);
                 refreshLockView(1000);
                 try_time_restriction = 5;
             }
@@ -349,11 +367,19 @@ public class LockView extends View {
                 step++;
                 try_time_restriction = 5;
             } else {
-                if(try_time_restriction>1) {
+                if(pointTrace.size() < 4) {//轨迹小于四,弹出错误提示,但是不计入尝试次数
+                    message = "密码错误";
+                    for (Point point : pointTrace) {
+                        point.setState(-1);
+                    }
+                    paintL.setColor(Color.RED);
+                    refreshLockView(1000);
+                }else if(try_time_restriction>1) {
                     message = "密码错误,还可尝试" + String.valueOf(--try_time_restriction) + "次";
                     for (Point point : pointTrace) {
                         point.setState(-1);
                     }
+                    paintL.setColor(Color.RED);
                     refreshLockView(1000);
                 }else{
                     if(null != onLockPanelListener) {
@@ -363,6 +389,7 @@ public class LockView extends View {
                     for (Point point : pointTrace) {
                         point.setState(-1);
                     }
+                    paintL.setColor(Color.RED);
                     refreshLockView(1000);
                     try_time_restriction = 5;
                 }
@@ -381,7 +408,7 @@ public class LockView extends View {
             if (password.equalsIgnoreCase(convertToPassword(pointTrace))) {
                 message = "密码已设置";
                 refreshLockView(100);
-                setPassword(password);
+                putPassword(password);
                 setVisibility(View.GONE);
                 ActionMode--; //切换到打开模式
                 step = 1;
@@ -390,6 +417,7 @@ public class LockView extends View {
                 for (Point point : pointTrace) {
                     point.setState(-1);
                 }
+                paintL.setColor(Color.RED);
                 refreshLockView(500);
                 step--;
             }
@@ -459,8 +487,21 @@ public class LockView extends View {
         return null;
     }
 
+    public void saveActionMode(){
+        SharedPreferences sp = context.getSharedPreferences("lock",Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sp.edit();
+        editor.putInt("actionmode",getActionMode());
+        editor.commit();
+    }
+
+    public int retrieveActionMode(){
+        SharedPreferences sp = context.getSharedPreferences("lock",Context.MODE_PRIVATE);
+        int action_mode = sp.getInt("actionmode",1);
+        return action_mode;
+    }
+
     //存储密码到SharedPreferences中,可重写成其他存储方式
-    public void setPassword(String pw) {
+    public void putPassword(String pw) {
         SharedPreferences sp = context.getSharedPreferences("lock", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sp.edit();
         editor.putString("password", pw);
@@ -493,7 +534,7 @@ public class LockView extends View {
      * @return 返回当前的ActionMode
      */
     public int getActionMode(){
-        return ActionMode;
+        return this.ActionMode;
     }
 
     /**

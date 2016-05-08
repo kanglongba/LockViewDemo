@@ -7,15 +7,23 @@
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:text="delete password"
+        android:id="@+id/btn_deletepassword"
+        />
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:text="set password"
         android:id="@+id/btn_setpassword"
-        />
+        android:layout_below="@id/btn_deletepassword"/>
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="open lock"
         android:id="@+id/btn_openlock"
         android:layout_below="@id/btn_setpassword"/>
+
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -40,9 +48,9 @@
         app:indicator_unselected="@drawable/indicator_unselected"
         android:layout_centerHorizontal="true"
         android:padding="1dp"
-        android:layout_margin="20dp"/>
+        android:layout_margin="5dp"/>
 
-    <com.bupt.enniu.lockviewdemo.LockView
+    <com.bupt.enniu.lockviewdemo.ExpandLockView
         android:layout_width="200dp"
         android:layout_height="200dp"
         android:padding="10dp"

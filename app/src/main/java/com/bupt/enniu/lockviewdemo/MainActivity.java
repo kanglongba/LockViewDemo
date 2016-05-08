@@ -4,18 +4,17 @@ import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener,LockView.OnUpdateMessageListener,LockView.OnLockPanelListener,LockView.OnUpdateIndicatorListener{
-    LockView lockView;
+public class MainActivity extends AppCompatActivity implements View.OnClickListener, ExpandLockView.OnUpdateMessageListener, ExpandLockView.OnLockPanelListener, ExpandLockView.OnUpdateIndicatorListener {
+    ExpandLockView expandLockView;
     IndicatorLockView indicatorLockView;
     Button btn_setpassword;
     Button btn_openlock;
     Button btn_resetpassword;
+    Button btn_deletepwd;
     SharedPreferences sp;
     TextView tv_message;
 
@@ -28,63 +27,69 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     }
 
-    void findViews(){
+    void findViews() {
 
-        btn_openlock = (Button)findViewById(R.id.btn_openlock);
+        btn_openlock = (Button) findViewById(R.id.btn_openlock);
         btn_setpassword = (Button) findViewById(R.id.btn_setpassword);
         btn_resetpassword = (Button) findViewById(R.id.btn_resetpassword);
+        btn_deletepwd = (Button) findViewById(R.id.btn_deletepassword);
         btn_openlock.setOnClickListener(this);
         btn_resetpassword.setOnClickListener(this);
         btn_setpassword.setOnClickListener(this);
+        btn_deletepwd.setOnClickListener(this);
 
-        tv_message = (TextView)findViewById(R.id.tv_message);
+        tv_message = (TextView) findViewById(R.id.tv_message);
 
-        lockView = (LockView)findViewById(R.id.lockview);
-        lockView.setOnUpdateMessageListener(this);
-        lockView.setOnLockPanelListener(this);
-        lockView.setOnUpdateIndicatorListener(this);
+        expandLockView = (ExpandLockView) findViewById(R.id.lockview);
+        expandLockView.setOnUpdateMessageListener(this);
+        expandLockView.setOnLockPanelListener(this);
+        expandLockView.setOnUpdateIndicatorListener(this);
 
-        indicatorLockView = (IndicatorLockView)findViewById(R.id.lockview_indicator);
+        indicatorLockView = (IndicatorLockView) findViewById(R.id.lockview_indicator);
 
-        sp = getSharedPreferences("lock",MODE_PRIVATE);
+        sp = getSharedPreferences("lock", MODE_PRIVATE);
     }
 
     @Override
     public void onClick(View v) {
-        if(lockView.getIsPanelLocked()){
-            if(System.currentTimeMillis() > lockView.getLockTime()){ //表示已经到了解封的时间
-                lockView.setIsPanelLocked(false);
+        if (expandLockView.getIsPanelLocked()) {
+            if (System.currentTimeMillis() > expandLockView.getLockTime()) { //表示已经到了解封的时间
+                expandLockView.setIsPanelLocked(false);
                 doAsAction(v);
-            }else {
-                String locktime = lockView.formatTime(lockView.getLockTime());
+            } else {
+                String locktime = expandLockView.formatTime(expandLockView.getLockTime());
                 tv_message.setText("请于" + locktime + "后尝试");
             }
-        }else {
+        } else {
             doAsAction(v);
         }
     }
 
-    private void doAsAction(View v){
+    private void doAsAction(View v) {
         switch (v.getId()) {
             case R.id.btn_setpassword:
                 String pw = sp.getString("password", "-1");
                 if ("-1".equalsIgnoreCase(pw)) {
                     tv_message.setText("请输入密码");
-                    lockView.setVisibility(View.VISIBLE);
-                    lockView.setActionMode(0);
+                    expandLockView.setVisibility(View.VISIBLE);
+                    expandLockView.setActionMode(0);
                 } else {
                     tv_message.setText("密码已经设置");
                 }
                 break;
             case R.id.btn_openlock:
                 tv_message.setText("请输入设置的密码");
-                lockView.setVisibility(View.VISIBLE);
-                lockView.setActionMode(1);
+                expandLockView.setVisibility(View.VISIBLE);
+                expandLockView.setActionMode(1);
                 break;
             case R.id.btn_resetpassword:
                 tv_message.setText("请输入当前密码");
-                lockView.setVisibility(View.VISIBLE);
-                lockView.setActionMode(2);
+                expandLockView.setVisibility(View.VISIBLE);
+                expandLockView.setActionMode(2);
+                break;
+            case R.id.btn_deletepassword:
+                expandLockView.setActionMode(0);
+                expandLockView.putPassword("-1");
                 break;
             default:
                 break;
@@ -98,20 +103,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onLockPanel() {
-        lockView.setIsPanelLocked(true);
-        lockView.setLockTime(1);
-        lockView.postDelayed(new Runnable() {
+        expandLockView.setIsPanelLocked(true);
+        expandLockView.setLockTime(1);
+        expandLockView.postDelayed(new Runnable() {
             @Override
             public void run() {
-                lockView.setVisibility(View.GONE);
+                expandLockView.setVisibility(View.GONE);
             }
-        },1000);
+        }, 1000);
     }
 
     @Override
     public void onUpdateIndicator() {
-        if(lockView.getPointTrace().size()>0)
-            Log.d("onDraw","run onUpdateIndicator");
-            indicatorLockView.setPath(lockView.getPointTrace());
+        if (expandLockView.getPointTrace().size() > 0)
+            Log.d("onDraw", "run onUpdateIndicator");
+        indicatorLockView.setPath(expandLockView.getPointTrace());
     }
 }
