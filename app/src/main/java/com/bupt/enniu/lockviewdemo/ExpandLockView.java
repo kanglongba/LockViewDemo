@@ -47,7 +47,6 @@ public class ExpandLockView extends View {
 
     List<Point> pointTrace = new ArrayList<Point>(); //手势轨迹
 
-    Paint paint;  //绘制锁圈
     Paint paintL; //绘制轨迹
     Drawable lock_unselected, lock_selected, lock_error_selected;
 
@@ -86,10 +85,6 @@ public class ExpandLockView extends View {
         this.context = context;
 
         //主要用于绘制轨迹
-        paint = new Paint();
-        paint.setAntiAlias(true);
-        paint.setStrokeWidth(5);
-
         paintL = new Paint();
         paintL.setAntiAlias(true);
         paintL.setStrokeWidth(5);
