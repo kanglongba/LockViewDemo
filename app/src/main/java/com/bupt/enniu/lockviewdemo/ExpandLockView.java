@@ -3,11 +3,10 @@ package com.bupt.enniu.lockviewdemo;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.TypedArray;
-import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -44,13 +43,13 @@ public class ExpandLockView extends View {
     Context context;
 
     Point point0, point1, point2, point3, point4, point5, point6, point7, point8; //九个锁圈
-    List<Point> points = new ArrayList<Point>();
+    List<Point> points = new ArrayList<Point>(); //锁圈的集合
 
     List<Point> pointTrace = new ArrayList<Point>(); //手势轨迹
 
-    Paint paint;
-    Paint paintL; //绘制连线
-    Bitmap lock_unselected, lock_selected, lock_error_selected;
+    Paint paint;  //绘制锁圈
+    Paint paintL; //绘制轨迹
+    Drawable lock_unselected, lock_selected, lock_error_selected;
 
     int currentX, currentY; //当前手指的坐标
 
@@ -99,12 +98,9 @@ public class ExpandLockView extends View {
         //获取到三个bitmap
         TypedArray typedArray = context.obtainStyledAttributes(attrs,R.styleable.ExpandLockView,0,0);
         try{
-            BitmapDrawable bd_lock_selected = (BitmapDrawable)typedArray.getDrawable(R.styleable.ExpandLockView_lock_selected);
-            BitmapDrawable bd_lock_selected_error = (BitmapDrawable)typedArray.getDrawable(R.styleable.ExpandLockView_lock_selected_error);
-            BitmapDrawable bd_lock_unselected = (BitmapDrawable)typedArray.getDrawable(R.styleable.ExpandLockView_lock_unselected);
-            lock_selected = bd_lock_selected.getBitmap();
-            lock_error_selected = bd_lock_selected_error.getBitmap();
-            lock_unselected = bd_lock_unselected.getBitmap();
+            lock_selected = typedArray.getDrawable(R.styleable.ExpandLockView_lock_selected);
+            lock_error_selected = typedArray.getDrawable(R.styleable.ExpandLockView_lock_selected_error);
+            lock_unselected = typedArray.getDrawable(R.styleable.ExpandLockView_lock_unselected);
         }finally {
             typedArray.recycle();
         }
@@ -190,12 +186,16 @@ public class ExpandLockView extends View {
     //绘制所有的Point
     private void drawPoints(Canvas canvas) {
         for (Point point : points) {
+
             if (point.getState() == 1) {
-                canvas.drawBitmap(lock_selected, null, point.getRectF(), paint);
+                lock_selected.setBounds(point.getRect());
+                lock_selected.draw(canvas);
             } else if (point.getState() == -1) {
-                canvas.drawBitmap(lock_error_selected, null, point.getRectF(), paint);
+                lock_error_selected.setBounds(point.getRect());
+                lock_error_selected.draw(canvas);
             } else {
-                canvas.drawBitmap(lock_unselected, null, point.getRectF(), paint);
+                lock_unselected.setBounds(point.getRect());
+                lock_unselected.draw(canvas);
             }
         }
     }

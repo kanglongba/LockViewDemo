@@ -1,6 +1,6 @@
 package com.bupt.enniu.lockviewdemo;
 
-import android.graphics.RectF;
+import android.graphics.Rect;
 
 /**
  * Created by edison on 15/12/11.
@@ -8,7 +8,7 @@ import android.graphics.RectF;
 public class Point {
 
     volatile int state; //Point当前的状态.0,未选中;1,选中;-1,错误
-    RectF rectF; //圆圈的范围
+    Rect rect; //圆圈的范围
     int index; //圆环的索引
     int x; //rectF左上角的X轴坐标
     int y; //rectF左上角的Y轴坐标
@@ -34,7 +34,7 @@ public class Point {
         x = (index % 3) * 2 * length + paddingLeft;
         y = (index / 3) * 2 * length + paddingTop;
 
-        rectF = new RectF(x, y, x + length, y + length);
+        rect = new Rect(x, y, x + length, y + length);
 
         centerX = x + length / 2;
         centerY = y + length / 2;
@@ -60,13 +60,13 @@ public class Point {
         state = updatestate;
     }
 
-    public RectF getRectF() {
-        return rectF;
+    public Rect getRect() {
+        return rect;
     }
 
     //判断坐标是否与矩形相交,如果相交,则选中此圆环
     public boolean isIntersected(int x, int y) {
-        if (rectF.contains(x, y)) {
+        if (rect.contains(x, y)) {
             //如果包含坐标
             if (getState() == 0) {
                 //且圆环当前处于未选中状态
