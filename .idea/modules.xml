@@ -2,8 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/LockViewDemo.iml" filepath="$PROJECT_DIR$/LockViewDemo.iml" />
-      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/LockViewDemo.iml" filepath="$PROJECT_DIR$/LockViewDemo.iml" group="LockViewDemo" />
+      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" group="LockViewDemo/app" />
     </modules>
   </component>
 </project>
